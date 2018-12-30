@@ -1,0 +1,5 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="distance_small">8dp</dimen>
+    <dimen name="distance_extra_small">4dp</dimen>
+</resources>
