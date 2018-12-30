@@ -4,5 +4,12 @@
     <string name="edt_hint_username">Username</string>
     <string name="edt_hint_password">Password</string>
     <string name="btn_login_text">Login</string>
+    <string name="msg_loginFailed">Login failed</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>
