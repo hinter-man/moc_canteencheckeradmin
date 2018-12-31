@@ -8,6 +8,8 @@ import com.example.canteenchecker.canteenmanager.domain.Rating;
 import com.example.canteenchecker.canteenmanager.domain.ReviewData;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import okhttp3.Interceptor;
@@ -15,6 +17,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
@@ -51,6 +54,7 @@ public class ServiceProxy {
 
 
     private final Proxy proxy = new Retrofit.Builder()
+            .client(httpClient.build())
             .baseUrl(SERVICE_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -67,7 +71,18 @@ public class ServiceProxy {
 
     public String Login(String username, String password) throws IOException {
         causeDelay();
-        return  proxy.postLogin(new ProxyLogin(username, password)).execute().body();
+        return proxy.postLogin(new ProxyLogin(username, password)).execute().body();
+    }
+
+    public Canteen getCanteen() throws IOException {
+        causeDelay();
+
+        ProxyCanteen proxyCanteen = proxy.getCanteen().execute().body();
+        if (proxyCanteen != null) {
+            return proxyCanteen.toCanteen();
+        }
+
+        return null;
     }
 
 
@@ -77,9 +92,9 @@ public class ServiceProxy {
         @POST("/Admin/Login")
         Call<String> postLogin(@Body ProxyLogin login);
 
-//        @GET("/Public/Canteen/{id}")
-//        Call<ProxyCanteen> getCanteen(@Path("id") String canteenId);
-//
+        @GET("/Admin/Canteen/")
+        Call<ProxyCanteen> getCanteen();
+
 //        @PUT("/Public/Canteen")
 //        Call<Void> updateCanteen(@Body ProxyCanteen proxyCanteen);
 //
@@ -101,10 +116,18 @@ public class ServiceProxy {
         String address;
         float averageRating;
         int averageWaitingTime;
-        List<Rating> ratingList;
+        Collection<ProxyRating> ratings;
 
         Canteen toCanteen() {
-            return new Canteen(String.valueOf(canteenId), name, phone, website, meal, mealPrice, averageRating, address, averageWaitingTime, ratingList);
+            // create ratings
+            Collection<Rating> domainRatings = new ArrayList<>();
+            for (ProxyRating proxyRating : ratings) {
+                domainRatings.add(
+                        new Rating(proxyRating.ratingId, proxyRating.username, proxyRating.remark, proxyRating.ratingPoints, proxyRating.timestamp));
+            }
+            // add to canteen
+            Canteen canteen = new Canteen(String.valueOf(canteenId), name, phone, website, meal, mealPrice, averageRating, address, averageWaitingTime, domainRatings);
+            return canteen;
         }
     }
 
@@ -126,13 +149,11 @@ public class ServiceProxy {
     }
 
     private static class ProxyRating {
-
         int ratingId;
         String username;
         String remark;
         int ratingPoints;
         long timestamp;
-
     }
 
     private static class ProxyLogin {

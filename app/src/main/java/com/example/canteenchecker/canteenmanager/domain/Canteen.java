@@ -2,6 +2,7 @@ package com.example.canteenchecker.canteenmanager.domain;
 
 import com.example.canteenchecker.canteenmanager.proxy.ServiceProxy;
 
+import java.util.Collection;
 import java.util.List;
 
 public class Canteen {
@@ -15,10 +16,10 @@ public class Canteen {
     private final float averageRating;
     private final String location;
     private final int averageWaitingTime;
-    private List<Rating> ratings;
+    private Collection<Rating> ratings;
 
     public Canteen(String id, String name, String phoneNumber, String website, String setMeal, float setMealPrice, float averageRating, String location, int averageWaitingTime,
-                   List<Rating> ratings) {
+                   Collection<Rating> ratings) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -66,5 +67,7 @@ public class Canteen {
     public int getAverageWaitingTime() {
         return averageWaitingTime;
     }
+
+    public Collection<Rating> getRatings() { return ratings; }
 
 }

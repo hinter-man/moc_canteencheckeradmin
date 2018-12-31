@@ -7,6 +7,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * SectionsPageAdapter extends FragmentPagerAdapter
+ * holds information about every Fragment in the MainActivity
+ */
 public class SectionsPageAdapter extends FragmentPagerAdapter {
 
     private final List<Fragment> fragments = new ArrayList<Fragment>();
