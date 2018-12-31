@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +37,7 @@ public class CanteenFragment extends Fragment {
     private EditText edtPhoneNo;
     private SeekBar seekBarWaitingTime;
     private TextView txvSeekBarWaitingTimeValue;
+    private FloatingActionButton btnupdateCanteen;
 
     @Nullable
     @Override
@@ -67,8 +70,20 @@ public class CanteenFragment extends Fragment {
                 txvSeekBarWaitingTimeValue.setText(waitingTime + " mins");
             }
         });
+        btnupdateCanteen = view.findViewById(R.id.btn_update_canteen);
+        btnupdateCanteen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateCanteen();
+            }
+        });
 
         return view;
+    }
+
+    private void updateCanteen() {
+        // TODO update canteen
+        Toast.makeText(getContext(), "Canteen updated!?", Toast.LENGTH_LONG).show();
     }
 
     public void SetCanteenData(Canteen canteen) {

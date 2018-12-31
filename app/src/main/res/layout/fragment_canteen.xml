@@ -107,5 +107,12 @@
         </android.support.v7.widget.LinearLayoutCompat>
     </android.support.v7.widget.LinearLayoutCompat>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_update_canteen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/distance_small"
+        android:src="@drawable/ic_save_black_24dp" />
 
 </android.support.v7.widget.LinearLayoutCompat>
