@@ -1,6 +1,7 @@
 package com.example.canteenchecker.canteenmanager.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,7 +38,7 @@ public class CanteenFragment extends Fragment {
     private EditText edtPhoneNo;
     private SeekBar seekBarWaitingTime;
     private TextView txvSeekBarWaitingTimeValue;
-    private FloatingActionButton btnupdateCanteen;
+    private FloatingActionButton btnUpdateCanteen;
 
     @Nullable
     @Override
@@ -70,8 +71,8 @@ public class CanteenFragment extends Fragment {
                 txvSeekBarWaitingTimeValue.setText(waitingTime + " mins");
             }
         });
-        btnupdateCanteen = view.findViewById(R.id.btn_update_canteen);
-        btnupdateCanteen.setOnClickListener(new View.OnClickListener() {
+        btnUpdateCanteen = view.findViewById(R.id.btn_update_canteen);
+        btnUpdateCanteen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateCanteen();
@@ -81,12 +82,56 @@ public class CanteenFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void updateCanteen() {
-        // TODO update canteen
-        Toast.makeText(getContext(), "Canteen updated!?", Toast.LENGTH_LONG).show();
+        new AsyncTask<Object, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                setUiEnabled(false);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                setUiEnabled(true);
+                if (result) {
+                    Toast.makeText(getContext(), R.string.canteen_updated_msg, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), R.string.canteen_update_failed_msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            protected Boolean doInBackground(Object... objects) {
+                try {
+                    return new ServiceProxy().updateCanteen(
+                            (int)objects[0],
+                            (String)objects[1],
+                            (String)objects[2],
+                            (float)objects[3],
+                            (String)objects[4],
+                            (String)objects[5],
+                            (String)objects[6],
+                            (float)objects[7],
+                            (int)objects[8]
+                    );
+                } catch (IOException e) {
+                    Log.e(TAG, getString(R.string.canteen_update_failed_msg), e);
+                    return false;
+                }
+            }
+        }.execute(
+                Integer.parseInt(canteen.getId()),
+                edtCanteenName.getText().toString(),
+                edtMenu.getText().toString(),
+                Float.parseFloat(edtMenuPrice.getText().toString()),
+                edtHomepage.getText().toString(),
+                edtPhoneNo.getText().toString(),
+                edtAddress.getText().toString(),
+                canteen.getAverageRating(),
+                seekBarWaitingTime.getProgress());
     }
 
-    public void SetCanteenData(Canteen canteen) {
+    public void setCanteenData(Canteen canteen) {
         this.canteen = canteen;
         // fill view with canteen data
         edtCanteenName.setText(canteen.getName());
@@ -96,6 +141,19 @@ public class CanteenFragment extends Fragment {
         edtHomepage.setText(canteen.getWebsite());
         edtPhoneNo.setText(canteen.getPhoneNumber());
         seekBarWaitingTime.setProgress(canteen.getAverageWaitingTime());
-        txvSeekBarWaitingTimeValue.setText(canteen.getAverageWaitingTime() + " mins");
+        txvSeekBarWaitingTimeValue.setText(String.format("%d min", canteen.getAverageWaitingTime()));
+    }
+
+
+    private void setUiEnabled(boolean enabled) {
+        edtCanteenName.setEnabled(enabled);
+        edtMenu.setEnabled(enabled);
+        edtMenuPrice.setEnabled(enabled);
+        edtAddress.setEnabled(enabled);
+        edtHomepage.setEnabled(enabled);
+        edtPhoneNo.setEnabled(enabled);
+        seekBarWaitingTime.setEnabled(enabled);
+        txvSeekBarWaitingTimeValue.setEnabled(enabled);
+        btnUpdateCanteen.setEnabled(enabled);
     }
 }

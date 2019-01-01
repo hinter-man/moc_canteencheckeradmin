@@ -4,26 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
-import android.view.ViewManager;
-import android.widget.TableLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.canteenchecker.canteenmanager.R;
@@ -32,7 +18,6 @@ import com.example.canteenchecker.canteenmanager.proxy.ServiceProxy;
 import com.example.canteenchecker.canteenmanager.ui.helper.SectionsPageAdapter;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 
 /**
  * handles tablayout fragments
@@ -100,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 if (canteen != null) {
-                    canteenFragment.SetCanteenData(canteen);
+                    canteenFragment.setCanteenData(canteen);
                 }
             }
         }.execute();

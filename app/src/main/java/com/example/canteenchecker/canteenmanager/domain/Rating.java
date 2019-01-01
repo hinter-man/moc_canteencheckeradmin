@@ -15,4 +15,25 @@ public class Rating {
     String remark;
     int ratingPoints;
     long timestamp;
+
+    public int getRatingId() {
+        return ratingId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public int getRatingPoints() {
+        return ratingPoints;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
 }

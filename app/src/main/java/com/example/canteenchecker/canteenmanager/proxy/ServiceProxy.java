@@ -85,6 +85,27 @@ public class ServiceProxy {
         return null;
     }
 
+    public boolean updateCanteen(int canteenId, String name, String meal, float mealPrice, String website, String phone, String address, float averageRating, int averageWaitingTime) throws IOException {
+        causeDelay();
+
+        ProxyCanteen proxyCanteen =
+                new ProxyCanteen(
+                        canteenId,
+                        name,
+                        meal,
+                        mealPrice,
+                        website,
+                        phone,
+                        address,
+                        averageRating,
+                        averageWaitingTime
+                        );
+
+        // check if http status code is in range of 200-300
+        retrofit2.Response r = proxy.updateCanteen(proxyCanteen).execute();
+        return r.isSuccessful();
+    }
+
 
 
     private interface Proxy {
@@ -95,8 +116,8 @@ public class ServiceProxy {
         @GET("/Admin/Canteen/")
         Call<ProxyCanteen> getCanteen();
 
-//        @PUT("/Public/Canteen")
-//        Call<Void> updateCanteen(@Body ProxyCanteen proxyCanteen);
+        @PUT("/Admin/Canteen")
+        Call<Void> updateCanteen(@Body ProxyCanteen proxyCanteen);
 //
 //        @GET("/Public/Canteen/{id}/Rating?nrOfRatings=0")
 //        Call<ProxyReviewData> getReviewDataForCanteen(@Path("id") String canteenId);
@@ -117,6 +138,18 @@ public class ServiceProxy {
         float averageRating;
         int averageWaitingTime;
         Collection<ProxyRating> ratings;
+
+        public ProxyCanteen(int canteenId, String name, String meal, float mealPrice, String website, String phone, String address, float averageRating, int averageWaitingTime) {
+            this.canteenId = canteenId;
+            this.name = name;
+            this.meal = meal;
+            this.mealPrice = mealPrice;
+            this.website = website;
+            this.phone = phone;
+            this.address = address;
+            this.averageRating = averageRating;
+            this.averageWaitingTime = averageWaitingTime;
+        }
 
         Canteen toCanteen() {
             // create ratings

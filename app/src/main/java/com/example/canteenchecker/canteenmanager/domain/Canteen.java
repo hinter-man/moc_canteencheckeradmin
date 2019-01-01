@@ -16,7 +16,7 @@ public class Canteen {
     private final float averageRating;
     private final String location;
     private final int averageWaitingTime;
-    private Collection<Rating> ratings;
+    private final Collection<Rating> ratings;
 
     public Canteen(String id, String name, String phoneNumber, String website, String setMeal, float setMealPrice, float averageRating, String location, int averageWaitingTime,
                    Collection<Rating> ratings) {
