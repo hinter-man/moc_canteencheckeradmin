@@ -86,7 +86,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (canteen != null) {
                     canteenFragment.setCanteenData(canteen);
+                    if (canteen.getRatings() != null) {
+                        ratingsFragment.setRatings(canteen.getRatings());
+                    }
                 }
+
             }
         }.execute();
     }

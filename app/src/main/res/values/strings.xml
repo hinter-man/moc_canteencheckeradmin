@@ -12,5 +12,5 @@
     <string name="fetch_canteenData_failed">Fetching canteen data failed</string>
     <string name="canteen_update_failed_msg">Canteen update failed</string>
     <string name="canteen_updated_msg">Canteen updated</string>
-
+    <string name="ratings_failed_msg">get ratings failed</string>
 </resources>

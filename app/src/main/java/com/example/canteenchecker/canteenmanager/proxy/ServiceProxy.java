@@ -21,6 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -69,7 +70,7 @@ public class ServiceProxy {
     }
 
 
-    public String Login(String username, String password) throws IOException {
+    public String login(String username, String password) throws IOException {
         causeDelay();
         return proxy.postLogin(new ProxyLogin(username, password)).execute().body();
     }
@@ -106,11 +107,16 @@ public class ServiceProxy {
         return r.isSuccessful();
     }
 
+    public boolean deleteRating(int ratingId) throws IOException {
+        retrofit2.Response r = proxy.deleteRating(ratingId).execute();
+        return r.isSuccessful();
+    }
+
 
 
     private interface Proxy {
 
-        @POST("/Admin/Login")
+        @POST("/Admin/login")
         Call<String> postLogin(@Body ProxyLogin login);
 
         @GET("/Admin/Canteen/")
@@ -118,12 +124,9 @@ public class ServiceProxy {
 
         @PUT("/Admin/Canteen")
         Call<Void> updateCanteen(@Body ProxyCanteen proxyCanteen);
-//
-//        @GET("/Public/Canteen/{id}/Rating?nrOfRatings=0")
-//        Call<ProxyReviewData> getReviewDataForCanteen(@Path("id") String canteenId);
 
-        //@POST("/Admin/Canteen/Rating")
-        //Call<ProxyRating> postRating(@Header("Authorization") String authenticationToken, @Body ProxyNewRating rating);
+        @DELETE("/Admin/Canteen/Rating/{ratingId}")
+        Call<Void> deleteRating(@Path("ratingId") int ratingId);
 
     }
 
@@ -154,9 +157,11 @@ public class ServiceProxy {
         Canteen toCanteen() {
             // create ratings
             Collection<Rating> domainRatings = new ArrayList<>();
-            for (ProxyRating proxyRating : ratings) {
-                domainRatings.add(
-                        new Rating(proxyRating.ratingId, proxyRating.username, proxyRating.remark, proxyRating.ratingPoints, proxyRating.timestamp));
+            if (ratings != null) {
+                for (ProxyRating proxyRating : ratings) {
+                    domainRatings.add(
+                            new Rating(proxyRating.ratingId, proxyRating.username, proxyRating.remark, proxyRating.ratingPoints, proxyRating.timestamp));
+                }
             }
             // add to canteen
             Canteen canteen = new Canteen(String.valueOf(canteenId), name, phone, website, meal, mealPrice, averageRating, address, averageWaitingTime, domainRatings);

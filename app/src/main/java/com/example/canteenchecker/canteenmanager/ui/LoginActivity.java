@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(String... strings) {
                 try {
-                    return new ServiceProxy().Login(strings[0], strings[1]);
+                    return new ServiceProxy().login(strings[0], strings[1]);
                 } catch (IOException e) {
                     Log.e(TAG, getString(R.string.msg_loginFailed), e);
                     return null;
@@ -83,6 +83,9 @@ public class LoginActivity extends AppCompatActivity {
                     // start main activity
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
+
+                    // finishes login activity -> so the user can't hit back button in main activity
+                    finish();
                 } else {
                     edtPassword.setText(null);
                     setUIEnabled(true);
