@@ -1,6 +1,8 @@
 package com.example.canteenchecker.canteenmanager.ui;
 
 import android.annotation.SuppressLint;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,13 +20,23 @@ import android.widget.Toast;
 import com.example.canteenchecker.canteenmanager.R;
 import com.example.canteenchecker.canteenmanager.domain.Canteen;
 import com.example.canteenchecker.canteenmanager.proxy.ServiceProxy;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.List;
 
 public class CanteenFragment extends Fragment {
 
     private static final String TAG = CanteenFragment.class.toString();
+    private static final float DEFAULT_MAP_ZOOM_FACTOR = 15;
 
     private Canteen canteen;
 
@@ -38,6 +50,11 @@ public class CanteenFragment extends Fragment {
     private TextView txvSeekBarWaitingTimeValue;
     private FloatingActionButton btnUpdateCanteen;
 
+    private SupportMapFragment mpfMap;
+    private GoogleMap map;
+
+
+    @SuppressLint("StaticFieldLeak")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,7 +94,100 @@ public class CanteenFragment extends Fragment {
             }
         });
 
+        mpfMap = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mpfMap);
+        mpfMap.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(final GoogleMap googleMap) {
+                UiSettings uiSettings = googleMap.getUiSettings();
+                uiSettings.setAllGesturesEnabled(true);
+                uiSettings.setZoomControlsEnabled(true);
+
+                googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        Geocoder geocoder = new Geocoder(getActivity());
+                        // Creating a marker
+                        MarkerOptions markerOptions = new MarkerOptions();
+
+                        // Setting the position for the marker
+                        markerOptions.position(latLng);
+
+                        // Setting the title for the marker.
+                        // This will be displayed on taping the marker
+                        markerOptions.title(latLng.latitude + " : " + latLng.longitude);
+
+                        // Clears the previously touched position
+                        googleMap.clear();
+
+                        // Animating to the touched position
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+                        // Placing a marker on the touched position
+                        googleMap.addMarker(markerOptions);
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                            if (addresses != null && addresses.size() > 0) {
+                                Address address = addresses.get(0);
+                                edtAddress.setText(address.getAddressLine(0));
+                            } else {
+                                Log.w(TAG, "Resolving of location '%s' failed.");
+                            }
+                        } catch (IOException e) {
+                            Log.w(TAG, "Resolving of location '%s' failed.", e);
+                        }
+                    }
+                });
+            }
+        });
+
+        updateMapsFromCanteenLocation();
+        
         return view;
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void updateMapsFromCanteenLocation() {
+        if (canteen != null && mpfMap != null) {
+            new AsyncTask<String, Void, LatLng>() {
+                @Override
+                protected LatLng doInBackground(String... strings) {
+                    LatLng location = null;
+                    Geocoder geocoder = new Geocoder(getActivity());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocationName(strings[0], 1);
+                        // TODO
+                        if (addresses != null && addresses.size() > 0) {
+                            Address address = addresses.get(0);
+                            location = new LatLng(address.getLatitude(), address.getLongitude());
+                        } else {
+                            Log.w(TAG, String.format("Resolving of location '%s' failed.", strings[0]));
+                        }
+                    } catch (IOException e) {
+                        Log.w(TAG, String.format("Resolving of location '%s' failed.", strings[0]), e);
+                    }
+                    return location;
+                }
+
+                @Override
+                protected void onPostExecute(final LatLng latLng) {
+                    mpfMap.getMapAsync(new OnMapReadyCallback() {
+                        @Override
+                        public void onMapReady(GoogleMap googleMap) {
+                            googleMap.clear();
+                            if (latLng != null) {
+                                googleMap.addMarker(new MarkerOptions().position(latLng));
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_MAP_ZOOM_FACTOR));
+                            } else {
+                                // show whole map zoomed out
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0,0), 0));
+                            }
+                        }
+                    });
+                }
+
+            }.execute(canteen.getLocation());
+
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -129,6 +239,7 @@ public class CanteenFragment extends Fragment {
                 seekBarWaitingTime.getProgress());
     }
 
+    @SuppressLint("StaticFieldLeak")
     public void setCanteenData(Canteen canteen) {
         this.canteen = canteen;
         // fill view with canteen data
@@ -140,6 +251,7 @@ public class CanteenFragment extends Fragment {
         edtPhoneNo.setText(canteen.getPhoneNumber());
         seekBarWaitingTime.setProgress(canteen.getAverageWaitingTime());
         txvSeekBarWaitingTimeValue.setText(String.format("%d min", canteen.getAverageWaitingTime()));
+        updateMapsFromCanteenLocation();
     }
 
 

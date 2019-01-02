@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
                 broadcastReceiver,
                 CanteenFirebaseMessagingService.createCanteenChangedIntentFilter());
 
+
+
         GetCanteenData(false);
     }
 
