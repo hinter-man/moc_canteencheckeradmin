@@ -2,8 +2,12 @@ package com.example.canteenchecker.canteenmanager.ui;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.view.ViewPager;
@@ -12,9 +16,11 @@ import android.util.Log;
 
 import android.widget.Toast;
 
+import com.example.canteenchecker.canteenmanager.CanteenManagerApplication;
 import com.example.canteenchecker.canteenmanager.R;
 import com.example.canteenchecker.canteenmanager.domain.Canteen;
 import com.example.canteenchecker.canteenmanager.proxy.ServiceProxy;
+import com.example.canteenchecker.canteenmanager.service.CanteenFirebaseMessagingService;
 import com.example.canteenchecker.canteenmanager.ui.helper.SectionsPageAdapter;
 
 import java.io.IOException;
@@ -31,6 +37,22 @@ public class MainActivity extends AppCompatActivity {
     private CanteenFragment canteenFragment = new CanteenFragment();
     private RatingsFragment ratingsFragment = new RatingsFragment();
 
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            GetCanteenData(true);
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Important -> otherwise memory leaks!!
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(broadcastReceiver);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +65,11 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        GetCanteenData();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                broadcastReceiver,
+                CanteenFirebaseMessagingService.createCanteenChangedIntentFilter());
+
+        GetCanteenData(false);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -57,19 +83,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void GetCanteenData() {
+    private void GetCanteenData(final boolean doInBackground) {
         new AsyncTask<Void, Void, Canteen>() {
             private ProgressDialog progressDialog;
 
             @Override
             protected void onPreExecute() {
-                progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setTitle("Fetching data for you...");
-                progressDialog.show();
+                if (!doInBackground) {
+                    progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.setTitle("Fetching data for you...");
+                    progressDialog.show();
+                }
             }
 
             @Override
-            protected Canteen doInBackground(Void... voids) {
+            protected Canteen doInBackground(Void... Voids) {
                 try {
                     return new ServiceProxy().getCanteen();
                 } catch (IOException e) {
@@ -81,10 +109,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Canteen canteen) {
-                if (progressDialog.isShowing()) {
-                    progressDialog.dismiss();
+                if (!doInBackground) {
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
                 }
+
                 if (canteen != null) {
+                    CanteenManagerApplication.getInstance().setCanteenId(canteen.getId());
                     canteenFragment.setCanteenData(canteen);
                     if (canteen.getRatings() != null) {
                         ratingsFragment.setRatings(canteen.getRatings());

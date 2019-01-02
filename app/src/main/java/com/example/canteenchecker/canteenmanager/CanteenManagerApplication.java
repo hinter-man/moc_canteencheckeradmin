@@ -11,6 +11,7 @@ public class CanteenManagerApplication extends Application {
     private static CanteenManagerApplication instance;
     public static CanteenManagerApplication getInstance() { return instance; }
     private String authenticationToken;
+    private String canteenId;
 
     @Override
     public void onCreate() {
@@ -34,5 +35,12 @@ public class CanteenManagerApplication extends Application {
         return getAuthenticationToken() != null;
     }
 
+    public synchronized String getCanteenId() {
+        return canteenId;
+    }
+
+    public synchronized void setCanteenId(String canteenId) {
+        this.canteenId = canteenId;
+    }
 
 }
