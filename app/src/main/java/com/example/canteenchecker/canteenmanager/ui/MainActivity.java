@@ -6,14 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.canteenchecker.canteenmanager.CanteenManagerApplication;
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CanteenFragment canteenFragment = new CanteenFragment();
     private RatingsFragment ratingsFragment = new RatingsFragment();
+    private Toolbar toolbar;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -43,6 +44,18 @@ public class MainActivity extends AppCompatActivity {
             GetCanteenData(true);
         }
     };
+
+    private void showCanteenStats() {
+        Intent intent = new Intent(MainActivity.this, StatsActivity.class);
+        startActivity(intent);
+    }
+
+    private void logout() {
+        CanteenManagerApplication.getInstance().setAuthenticationToken(null);
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     protected void onDestroy() {
@@ -64,6 +77,27 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setSubtitle(CanteenManagerApplication.getInstance().getUsername());
+        toolbar.inflateMenu(R.menu.main_activity_menu);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // Handle item selection
+                switch (item.getItemId()) {
+                    case R.id.menu_item_logout:
+                        logout();
+                        return true;
+                    case R.id.menu_item_show_stats:
+                        showCanteenStats();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 broadcastReceiver,

@@ -112,7 +112,10 @@ public class ServiceProxy {
         return r.isSuccessful();
     }
 
-
+    public ReviewData getReviewData(String canteenId) throws IOException {
+        ProxyReviewData proxyReviewData = proxy.getReviewData(canteenId).execute().body();
+        return proxyReviewData.toReviewData();
+    }
 
     private interface Proxy {
 
@@ -127,6 +130,9 @@ public class ServiceProxy {
 
         @DELETE("/Admin/Canteen/Rating/{ratingId}")
         Call<Void> deleteRating(@Path("ratingId") int ratingId);
+
+        @GET("/Public/Canteen/{canteenId}/Rating")
+        Call<ProxyReviewData> getReviewData(@Path("canteenId") String canteenId);
 
     }
 
@@ -171,9 +177,8 @@ public class ServiceProxy {
 
     private static class ProxyReviewData {
         float average;
-        //int count;
+        int count;
         int totalCount;
-        //ProxyRating[] ratings;
         int[] countsPerGrade;
 
         private int getRatingsForGrade(int grade) {
@@ -182,7 +187,7 @@ public class ServiceProxy {
         }
 
         ReviewData toReviewData() {
-            return new ReviewData(average, totalCount, getRatingsForGrade(1), getRatingsForGrade(2), getRatingsForGrade(3), getRatingsForGrade(4), getRatingsForGrade(5));
+            return new ReviewData(average, totalCount, getRatingsForGrade(1), getRatingsForGrade(2), getRatingsForGrade(3), getRatingsForGrade(4), getRatingsForGrade(5), countsPerGrade);
         }
     }
 

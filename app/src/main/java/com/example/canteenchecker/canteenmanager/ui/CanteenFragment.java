@@ -51,8 +51,6 @@ public class CanteenFragment extends Fragment {
     private FloatingActionButton btnUpdateCanteen;
 
     private SupportMapFragment mpfMap;
-    private GoogleMap map;
-
 
     @SuppressLint("StaticFieldLeak")
     @Nullable
@@ -108,23 +106,16 @@ public class CanteenFragment extends Fragment {
                         Geocoder geocoder = new Geocoder(getActivity());
                         // Creating a marker
                         MarkerOptions markerOptions = new MarkerOptions();
-
-                        // Setting the position for the marker
                         markerOptions.position(latLng);
-
-                        // Setting the title for the marker.
-                        // This will be displayed on taping the marker
                         markerOptions.title(latLng.latitude + " : " + latLng.longitude);
-
-                        // Clears the previously touched position
                         googleMap.clear();
-
-                        // Animating to the touched position
                         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
-                        // Placing a marker on the touched position
+                        // placing a marker on the touched position
                         googleMap.addMarker(markerOptions);
+
                         try {
+                            // set first found address from latlng location
                             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
                             if (addresses != null && addresses.size() > 0) {
                                 Address address = addresses.get(0);
@@ -155,7 +146,6 @@ public class CanteenFragment extends Fragment {
                     Geocoder geocoder = new Geocoder(getActivity());
                     try {
                         List<Address> addresses = geocoder.getFromLocationName(strings[0], 1);
-                        // TODO
                         if (addresses != null && addresses.size() > 0) {
                             Address address = addresses.get(0);
                             location = new LatLng(address.getLatitude(), address.getLongitude());
@@ -239,19 +229,20 @@ public class CanteenFragment extends Fragment {
                 seekBarWaitingTime.getProgress());
     }
 
-    @SuppressLint("StaticFieldLeak")
     public void setCanteenData(Canteen canteen) {
         this.canteen = canteen;
         // fill view with canteen data
-        edtCanteenName.setText(canteen.getName());
-        edtMenu.setText(canteen.getSetMeal());
-        edtMenuPrice.setText(NumberFormat.getNumberInstance().format(canteen.getSetMealPrice()));
-        edtAddress.setText(canteen.getLocation());
-        edtHomepage.setText(canteen.getWebsite());
-        edtPhoneNo.setText(canteen.getPhoneNumber());
-        seekBarWaitingTime.setProgress(canteen.getAverageWaitingTime());
-        txvSeekBarWaitingTimeValue.setText(String.format("%d min", canteen.getAverageWaitingTime()));
-        updateMapsFromCanteenLocation();
+        if (canteen != null) {
+            edtCanteenName.setText(canteen.getName());
+            edtMenu.setText(canteen.getSetMeal());
+            edtMenuPrice.setText(NumberFormat.getNumberInstance().format(canteen.getSetMealPrice()));
+            edtAddress.setText(canteen.getLocation());
+            edtHomepage.setText(canteen.getWebsite());
+            edtPhoneNo.setText(canteen.getPhoneNumber());
+            seekBarWaitingTime.setProgress(canteen.getAverageWaitingTime());
+            txvSeekBarWaitingTimeValue.setText(String.format("%d min", canteen.getAverageWaitingTime()));
+            updateMapsFromCanteenLocation();
+        }
     }
 
 

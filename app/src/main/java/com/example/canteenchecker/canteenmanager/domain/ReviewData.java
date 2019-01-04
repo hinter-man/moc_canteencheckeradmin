@@ -10,8 +10,9 @@ public class ReviewData {
     private final int ratingsFour;
     private final int ratingsFive;
     private final int totalRatingsOfMostCommonGrade;
+    private final int[] countsPerGrade;
 
-    public ReviewData(float averageRating, int totalRatings, int ratingsOne, int ratingsTwo, int ratingsThree, int ratingsFour, int ratingsFive) {
+    public ReviewData(float averageRating, int totalRatings, int ratingsOne, int ratingsTwo, int ratingsThree, int ratingsFour, int ratingsFive, int[] countsPerGrade) {
         this.averageRating = averageRating;
         this.totalRatings = totalRatings;
         this.ratingsOne = ratingsOne;
@@ -19,6 +20,8 @@ public class ReviewData {
         this.ratingsThree = ratingsThree;
         this.ratingsFour = ratingsFour;
         this.ratingsFive = ratingsFive;
+        this.countsPerGrade = countsPerGrade;
+
         totalRatingsOfMostCommonGrade = Math.max(Math.max(Math.max(Math.max(ratingsOne, ratingsTwo), ratingsThree), ratingsFour), ratingsFive);
     }
 
@@ -53,5 +56,7 @@ public class ReviewData {
     public int getTotalRatingsOfMostCommonGrade() {
         return totalRatingsOfMostCommonGrade;
     }
+
+    public int[] getCountsPerGrade() { return countsPerGrade; }
 
 }

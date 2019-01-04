@@ -45,6 +45,12 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
+        <activity
+            android:parentActivityName=".ui.MainActivity"
+            android:name=".ui.StatsActivity"
+            android:label="Stats">
+        </activity>
+
         <service android:name=".service.CanteenFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

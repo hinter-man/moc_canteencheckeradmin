@@ -28,6 +28,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtPassword;
     private Button btnLogin;
 
+    private String username;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Log.i(TAG, "onCreate");
@@ -60,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
     private void LogIn() {
         setUIEnabled(false);
 
-        String username = edtUsername.getText().toString();
+        username = edtUsername.getText().toString();
         final String password = edtPassword.getText().toString();
 
         new AsyncTask<String, Void, String>() {
@@ -79,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (authenticationToken != null) {
                     // login successful
                     CanteenManagerApplication.getInstance().setAuthenticationToken(authenticationToken);
+                    CanteenManagerApplication.getInstance().setUsername(username);
 
                     // start main activity
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);

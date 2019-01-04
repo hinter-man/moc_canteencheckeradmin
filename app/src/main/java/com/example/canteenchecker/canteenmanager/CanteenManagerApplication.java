@@ -10,6 +10,8 @@ public class CanteenManagerApplication extends Application {
     private static final String FIREBASE_MESSAGING_TOPIC = "canteens";
     private static CanteenManagerApplication instance;
     public static CanteenManagerApplication getInstance() { return instance; }
+
+    private String username;
     private String authenticationToken;
     private String canteenId;
 
@@ -41,6 +43,19 @@ public class CanteenManagerApplication extends Application {
 
     public synchronized void setCanteenId(String canteenId) {
         this.canteenId = canteenId;
+    }
+
+    public synchronized void logout() {
+        setAuthenticationToken(null);
+        setUsername(null);
+    }
+
+    public synchronized String getUsername() {
+        return username;
+    }
+
+    public synchronized void setUsername(String username) {
+        this.username = username;
     }
 
 }
